@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A4 Photo Collage - 6 Vertical Photos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .controls {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .controls h2 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .upload-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .upload-box {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .upload-box:hover::before {
+            opacity: 1;
+        }
+        
+        .upload-box:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .upload-box input {
+            display: none;
+        }
+        
+        .upload-box label {
+            cursor: pointer;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        /* A4 Page - 210mm x 297mm at 96 DPI = 794px x 1123px */
+        /* 0.7 inch margin = 17.78mm = 67px */
+        .a4-page {
+            width: 794px;
+            height: 1123px;
+            background: white;
+            margin: 0 auto;
+            box-shadow: 0 15px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 67px; /* 0.7 inch = 67px at 96 DPI */
+            position: relative;
+            border-radius: 8px;
+        }
+        
+        /* 60% of remaining height after margins */
+        .collage-area {
+            width: 100%;
+            height: 60%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .photo-slot {
+            background: #f5f5f5;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .photo-slot:hover {
+            border-color: #667eea;
+        }
+        
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+        
+        .photo-slot .placeholder {
+            color: #aaa;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .empty-space {
+            flex: 1;
+            background: #ffffff;
+            margin-top: 20px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .controls {
+                display: none;
+            }
+            
+            .a4-page {
+                width: 210mm;
+                height: 297mm;
+                box-shadow: none;
+                margin: 0;
+                padding: 17.78mm; /* 0.7 inch margins */
+                page-break-after: always;
+            }
+            
+            .collage-area {
+                height: 60%;
+            }
+        }
+        
+        @media (max-width: 850px) {
+            .a4-page {
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+        }
+        
+        @media (max-width: 680px) {
+            .a4-page {
+                transform: scale(0.6);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h2>📸 A4 Photo Collage Builder</h2>
+            <p class="subtitle">Create beautiful photo collages with ease</p>
+            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Upload 6 vertical photos.  A4 page  0.7 inch margins on all sides.</p>
+            
+            <div class="upload-section">
+                <div class="upload-box" onclick="document.getElementById('photo1').click()">
+                    <input type="file" id="photo1" accept="image/*" onchange="loadImage(1, this)">
+                    <label>📷 Photo 1<br><small>Click to upload</small></label>
+                </div>
+                <div class="upload-box" onclick="document.getElementById('photo2').click()">
+                    <input type="file" id="photo2" accept="image/*" onchange="loadImage(2, this)">
+                    <label>📷 Photo 2<br><small>Click to upload</small></label>
+                </div>
+                <div class="upload-box" onclick="document.getElementById('photo3').click()">
+                    <input type="file" id="photo3" accept="image/*" onchange="loadImage(3, this)">
+                    <label>📷 Photo 3<br><small>Click to upload</small></label>
+                </div>
+                <div class="upload-box" onclick="document.getElementById('photo4').click()">
+                    <input type="file" id="photo4" accept="image/*" onchange="loadImage(4, this)">
+                    <label>📷 Photo 4<br><small>Click to upload</small></label>
+                </div>
+                <div class="upload-box" onclick="document.getElementById('photo5').click()">
+                    <input type="file" id="photo5" accept="image/*" onchange="loadImage(5, this)">
+                    <label>📷 Photo 5<br><small>Click to upload</small></label>
+                </div>
+                <div class="upload-box" onclick="document.getElementById('photo6').click()">
+                    <input type="file" id="photo6" accept="image/*" onchange="loadImage(6, this)">
+                    <label>📷 Photo 6<br><small>Click to upload</small></label>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button onclick="window.print()">🖨️ Print Collage</button>
+                <button class="secondary" onclick="downloadCollage()">💾 Download as Image</button>
+                <button class="secondary" onclick="downloadPDF()">📄 Download as PDF</button>
+                <button class="secondary" onclick="clearAll()">🔄 Clear All</button>
+            </div>
+        </div>
+        
+        <div class="a4-page" id="collage">
+            <div class="collage-area">
+                <div class="photo-slot" id="slot1">
+                    <div class="placeholder">Photo 1</div>
+                </div>
+                <div class="photo-slot" id="slot2">
+                    <div class="placeholder">Photo 2</div>
+                </div>
+                <div class="photo-slot" id="slot3">
+                    <div class="placeholder">Photo 3</div>
+                </div>
+                <div class="photo-slot" id="slot4">
+                    <div class="placeholder">Photo 4</div>
+                </div>
+                <div class="photo-slot" id="slot5">
+                    <div class="placeholder">Photo 5</div>
+                </div>
+                <div class="photo-slot" id="slot6">
+                    <div class="placeholder">Photo 6</div>
+                </div>
+            </div>
+            <div class="empty-space"></div>
+        </div>
+    </div>
+    
+    <script>
+        const images = {};
+        
+        function loadImage(slotNumber, input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    images[slotNumber] = e.target.result;
+                    const slot = document.getElementById('slot' + slotNumber);
+                    slot.innerHTML = '<img src="' + e.target.result + '" alt="Photo ' + slotNumber + '">';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function clearAll() {
+            for (let i = 1; i <= 6; i++) {
+                const slot = document.getElementById('slot' + i);
+                slot.innerHTML = '<div class="placeholder">Photo ' + i + '</div>';
+                document.getElementById('photo' + i).value = '';
+            }
+            Object.keys(images).forEach(key => delete images[key]);
+        }
+        
+        async function downloadCollage() {
+            const collage = document.getElementById('collage');
+            
+            // Use html2canvas from CDN
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function() {
+                    captureAndDownload(collage);
+                };
+                document.head.appendChild(script);
+            } else {
+                captureAndDownload(collage);
+            }
+        }
+        
+        function captureAndDownload(element) {
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'photo-collage-a4.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+        
+        async function downloadPDF() {
+            const collage = document.getElementById('collage');
+            
+            // Load jsPDF library if not already loaded
+            if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                script.onload = function() {
+                    generatePDF(collage);
+                };
+                document.head.appendChild(script);
+            } else {
+                generatePDF(collage);
+            }
+        }
+        
+        function generatePDF(element) {
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // A4 dimensions in mm
+                const pdfWidth = 210;
+                const pdfHeight = 297;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('photo-collage-a4.pdf');
+            });
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
